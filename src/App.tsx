@@ -1,5 +1,7 @@
 import { Container } from '@mui/material';
+import { useEffect } from 'react';
 import AppComponent from './AppComponent';
+import { db } from './repositories/firebase';
 
 function App() {
   return (
