@@ -82,7 +82,7 @@ const AppComponent = ({
               dataURI={audioItems[audioItems.length - 1].dataURI}
               audioContext={audioContext}
               setIsChecking={setIsChecking}
-              deleteAudio={() => deleteAudio(audioItems.length)}
+              deleteAudio={() => deleteAudio(audioItems.length - 1)}
             />
           )}
         </>
