@@ -4,20 +4,21 @@ import { Button, IconButton } from '@mui/material';
 import React, { useMemo, useState } from 'react';
 
 import { Player } from '../classes/Player';
+import { AudioItem } from '..';
+import useAudioItems from '../services/useAudioItems';
 
 const CheckPane = ({
-  bpm,
-  dataURI,
+  audioItem,
   audioContext,
   deleteAudio,
   setIsChecking,
 }: {
-  bpm: number;
-  dataURI: string;
+  audioItem: AudioItem;
   audioContext: AudioContext;
-  setIsChecking: (value: boolean) => void;
   deleteAudio: () => void;
+  setIsChecking: (value: boolean) => void;
 }) => {
+  const { addAudioItem } = useAudioItems();
   const player = useMemo(() => new Player(), []);
   const [isPlayed, setIsPlayed] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -31,7 +32,7 @@ const CheckPane = ({
       player.stop();
     } else {
       player.audioContext = audioContext;
-      player.dataURI = dataURI;
+      player.dataURI = audioItem.dataURI;
       player.handleOnEnd = handleOnEnd;
       player.play();
       setIsPlayed(true);
@@ -42,6 +43,8 @@ const CheckPane = ({
   const saveAudioItem = () => {
     setIsPlayed(false);
     setIsChecking(false);
+    // fireStoreへ保存
+    addAudioItem(audioItem);
   };
 
   const deleteAudioItem = () => {
@@ -64,7 +67,7 @@ const CheckPane = ({
       }}
     >
       <div style={{ display: 'grid', rowGap: 8 }}>
-        <div style={{ textAlign: 'center', fontSize: 48 }}>{bpm}</div>
+        <div style={{ textAlign: 'center', fontSize: 48 }}>{audioItem.bpm}</div>
         <div style={{ textAlign: 'center' }}>録音を確認してください</div>
         <IconButton onClick={handlePlay} color='primary'>
           {isPlaying ? (

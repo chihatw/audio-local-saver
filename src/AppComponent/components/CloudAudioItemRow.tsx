@@ -4,22 +4,13 @@ import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import React, { useMemo, useState } from 'react';
 import { TableRow, TableCell, IconButton } from '@mui/material';
 
+import useAudioItems from '../services/useAudioItems';
 import getDate from '../services/getData';
 import { Player } from '../classes/Player';
+import { AudioItem } from '..';
 
-const AudioItemRow = ({
-  bpm,
-  dataURI,
-  miliSeconds,
-  audioContext,
-  handleDelete,
-}: {
-  bpm: number;
-  dataURI: string;
-  miliSeconds: number;
-  audioContext: AudioContext;
-  handleDelete: () => void;
-}) => {
+const CloudAudioItemRow = ({ audioItem }: { audioItem: AudioItem }) => {
+  const { deleteAudioItem } = useAudioItems();
   const player = useMemo(() => new Player(), []);
   const [isPlaying, setIsPlaying] = useState(false);
 
@@ -31,18 +22,23 @@ const AudioItemRow = ({
     if (isPlaying) {
       player.stop();
     } else {
-      player.audioContext = audioContext;
-      player.dataURI = dataURI;
+      player.audioContext = new AudioContext();
+      player.dataURI = audioItem.dataURI;
       player.handleOnEnd = handleOnEnd;
       player.play();
     }
     setIsPlaying(!isPlaying);
   };
 
+  const handleDelete = () => {
+    deleteAudioItem(audioItem.id);
+  };
+
   return (
     <TableRow>
-      <TableCell>{getDate(miliSeconds)}</TableCell>
-      <TableCell>{bpm}</TableCell>
+      <TableCell>{audioItem.assignmentId}</TableCell>
+      <TableCell>{getDate(Number(audioItem.id))}</TableCell>
+      <TableCell>{audioItem.bpm}</TableCell>
       <TableCell sx={{ width: 24 }}>
         <IconButton onClick={handleClick}>
           {isPlaying ? <StopIcon /> : <PlayArrowIcon />}
@@ -57,4 +53,4 @@ const AudioItemRow = ({
   );
 };
 
-export default AudioItemRow;
+export default CloudAudioItemRow;

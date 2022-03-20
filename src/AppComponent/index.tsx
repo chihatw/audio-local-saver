@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 
 import CheckPane from './components/CheckPane';
+import useAudioItems from './services/useAudioItems';
 import RecButtonPane from './components/RecButtonPane';
 import AudioItemTable from './components/AudioItemTable';
 import SetupButtonPane from './components/SetupButtonPane';
@@ -21,6 +22,7 @@ const AppComponent = ({
   beatCount: number;
   assignmentId: string;
 }) => {
+  const { deleteAudioItem } = useAudioItems();
   const localStorageAdaptor = useMemo(
     () => new LocalStorageAdaptor(assignmentId),
     []
@@ -36,11 +38,14 @@ const AppComponent = ({
 
   const deleteAudio = (index: number) => {
     localStorageAdaptor.removeAudioItem(index);
+    const targetId = audioItems[index].id;
 
     const cloned = [...audioItems];
     cloned.splice(index, 1);
     setAudioItems(cloned);
     localStorageAdaptor.audiItems = cloned;
+
+    deleteAudioItem(targetId);
   };
 
   const pushAudioItem = (audioItem: AudioItem) => {
@@ -78,11 +83,10 @@ const AppComponent = ({
           />
           {isChecking && audioItems[audioItems.length - 1] && (
             <CheckPane
-              bpm={audioItems[audioItems.length - 1].bpm}
-              dataURI={audioItems[audioItems.length - 1].dataURI}
+              audioItem={audioItems[audioItems.length - 1]}
               audioContext={audioContext}
-              setIsChecking={setIsChecking}
               deleteAudio={() => deleteAudio(audioItems.length - 1)}
+              setIsChecking={setIsChecking}
             />
           )}
         </>
