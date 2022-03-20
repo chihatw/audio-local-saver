@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import RecButtonPane from './components/RecButtonPane';
 import AudioItemTable from './components/AudioItemTable';
 import { LocalStorageAdaptor } from './classes/LocalStorageAdoptor';
+import { AudioContextFactory } from './classes/AudioContextFactory';
 
 export type AudioItem = {
   id: string;
@@ -20,7 +21,7 @@ const AppComponent = ({
   beatCount: number;
   assignmentId: string;
 }) => {
-  const localStorageAdoptor = useMemo(
+  const localStorageAdaptor = useMemo(
     () => new LocalStorageAdaptor(assignmentId),
     []
   );
@@ -28,11 +29,11 @@ const AppComponent = ({
   const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
 
   useEffect(() => {
-    setAudioItems(localStorageAdoptor.getAudioItems());
+    setAudioItems(localStorageAdaptor.getAudioItems());
   }, []);
 
   const deleteAudio = (index: number) => {
-    localStorageAdoptor.removeAudioItem(index);
+    localStorageAdaptor.removeAudioItem(index);
 
     const cloned = [...audioItems];
     cloned.splice(index, 1);
@@ -40,21 +41,15 @@ const AppComponent = ({
   };
 
   const pushAudioItem = (audioItem: AudioItem) => {
-    localStorageAdoptor.saveAudioItem(audioItem);
+    localStorageAdaptor.saveAudioItem(audioItem);
 
     const newAudioItems = [...audioItems, audioItem];
     setAudioItems(newAudioItems);
   };
 
   const handlePlay = async () => {
-    const audioContext = new window.AudioContext();
-    const osc = audioContext.createOscillator();
-    const gainNode = audioContext.createGain();
-    osc.connect(gainNode);
-    gainNode.connect(audioContext.destination);
-    gainNode.gain.value = 0;
-    osc.start(audioContext.currentTime);
-    osc.stop(audioContext.currentTime + 0.1);
+    const factory = new AudioContextFactory();
+    const audioContext = factory.create();
     setAudioContext(audioContext);
   };
 
