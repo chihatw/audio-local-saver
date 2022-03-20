@@ -31,7 +31,16 @@ const AudioItemRow = ({
       let audioContext = audioContextRef.current;
       if (!audioContext) {
         audioContext = new window.AudioContext();
+
         audioContextRef.current = audioContext;
+        // ダミーで音を鳴らす
+        const osc = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        osc.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        gainNode.gain.value = 0;
+        osc.start(audioContext.currentTime);
+        osc.stop(audioContext.currentTime + 0.01);
       }
       player.audioContext = audioContext;
       player.dataURI = dataURI;
