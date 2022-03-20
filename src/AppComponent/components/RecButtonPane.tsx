@@ -38,6 +38,7 @@ const RecButtonPane = ({
             id: String(Date.now()),
             bpm,
             dataURI,
+            isPerfect: true,
             assignmentId,
           };
           handleStartChecking();

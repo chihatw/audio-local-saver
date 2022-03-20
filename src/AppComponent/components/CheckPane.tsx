@@ -12,14 +12,18 @@ const CheckPane = ({
   audioContext,
   deleteAudio,
   setIsChecking,
+  updateLastAudioItem,
 }: {
   audioItem: AudioItem;
   audioContext: AudioContext;
   deleteAudio: () => void;
   setIsChecking: (value: boolean) => void;
+  updateLastAudioItem: (value: AudioItem) => void;
 }) => {
   const { addAudioItem } = useAudioItems();
+
   const player = useMemo(() => new Player(), []);
+
   const [isPlayed, setIsPlayed] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
 
@@ -40,11 +44,18 @@ const CheckPane = ({
     setIsPlaying(!isPlaying);
   };
 
-  const saveAudioItem = () => {
+  const saveAudioItem = (isPerfect: boolean) => {
     setIsPlayed(false);
     setIsChecking(false);
+
+    const cloned = { ...audioItem };
+    // きれいじゃない場合、audioItemの isPerfect を更新する
+    if (!isPerfect) {
+      cloned.isPerfect = false;
+      updateLastAudioItem(cloned);
+    }
     // fireStoreへ保存
-    addAudioItem(audioItem);
+    addAudioItem(cloned);
   };
 
   const deleteAudioItem = () => {
@@ -77,14 +88,21 @@ const CheckPane = ({
           )}
         </IconButton>
 
-        <div style={{ display: 'grid', rowGap: 8, height: 81 }}>
+        <div style={{ display: 'grid', rowGap: 16, height: 165 }}>
           {isPlayed && (
             <>
-              <Button onClick={saveAudioItem} variant='contained'>
-                残す
+              <Button
+                onClick={() => saveAudioItem(true)}
+                variant='contained'
+                size='small'
+              >
+                上手に読めた
+              </Button>
+              <Button onClick={() => saveAudioItem(false)} variant='contained'>
+                よくわからない
               </Button>
               <Button onClick={deleteAudioItem} variant='outlined'>
-                削除
+                この録音は削除
               </Button>
             </>
           )}

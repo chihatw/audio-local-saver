@@ -12,6 +12,7 @@ export type AudioItem = {
   id: string;
   bpm: number;
   dataURI: string;
+  isPerfect: boolean;
   assignmentId: string;
 };
 
@@ -55,6 +56,14 @@ const AppComponent = ({
     setAudioItems(newAudioItems);
   };
 
+  const updateLastAudioItem = (audioItem: AudioItem) => {
+    localStorageAdaptor.updateAudioItem(audioItem);
+    const cloned = [...audioItems];
+    cloned[cloned.length - 1] = audioItem;
+    setAudioItems(cloned);
+    localStorageAdaptor.audiItems = cloned;
+  };
+
   const handleSetup = async () => {
     const factory = new AudioContextFactory();
     const audioContext = factory.create();
@@ -87,6 +96,7 @@ const AppComponent = ({
               audioContext={audioContext}
               deleteAudio={() => deleteAudio(audioItems.length - 1)}
               setIsChecking={setIsChecking}
+              updateLastAudioItem={updateLastAudioItem}
             />
           )}
         </>

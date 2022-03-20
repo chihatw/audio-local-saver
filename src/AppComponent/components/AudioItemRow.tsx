@@ -6,17 +6,14 @@ import { TableRow, TableCell, IconButton } from '@mui/material';
 
 import getDate from '../services/getData';
 import { Player } from '../classes/Player';
+import { AudioItem } from '..';
 
 const AudioItemRow = ({
-  bpm,
-  dataURI,
-  miliSeconds,
+  audioItem,
   audioContext,
   handleDelete,
 }: {
-  bpm: number;
-  dataURI: string;
-  miliSeconds: number;
+  audioItem: AudioItem;
   audioContext: AudioContext;
   handleDelete: () => void;
 }) => {
@@ -32,7 +29,7 @@ const AudioItemRow = ({
       player.stop();
     } else {
       player.audioContext = audioContext;
-      player.dataURI = dataURI;
+      player.dataURI = audioItem.dataURI;
       player.handleOnEnd = handleOnEnd;
       player.play();
     }
@@ -41,8 +38,18 @@ const AudioItemRow = ({
 
   return (
     <TableRow>
-      <TableCell>{getDate(miliSeconds)}</TableCell>
-      <TableCell>{bpm}</TableCell>
+      <TableCell>{getDate(Number(audioItem.id))}</TableCell>
+      <TableCell>{audioItem.bpm}</TableCell>
+      <TableCell
+        sx={{
+          width: 32,
+          fontSize: audioItem.isPerfect ? 24 : 16,
+          textAlign: 'center',
+          color: audioItem.isPerfect ? 'green' : 'red',
+        }}
+      >
+        {audioItem.isPerfect ? '○' : '△'}
+      </TableCell>
       <TableCell sx={{ width: 24 }}>
         <IconButton onClick={handleClick}>
           {isPlaying ? <StopIcon /> : <PlayArrowIcon />}

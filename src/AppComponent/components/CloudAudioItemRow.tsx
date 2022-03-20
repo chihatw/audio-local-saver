@@ -39,6 +39,16 @@ const CloudAudioItemRow = ({ audioItem }: { audioItem: AudioItem }) => {
       <TableCell>{audioItem.assignmentId}</TableCell>
       <TableCell>{getDate(Number(audioItem.id))}</TableCell>
       <TableCell>{audioItem.bpm}</TableCell>
+      <TableCell
+        sx={{
+          width: 32,
+          fontSize: audioItem.isPerfect ? 24 : 16,
+          textAlign: 'center',
+          color: audioItem.isPerfect ? 'green' : 'red',
+        }}
+      >
+        {audioItem.isPerfect ? '○' : '△'}
+      </TableCell>
       <TableCell sx={{ width: 24 }}>
         <IconButton onClick={handleClick}>
           {isPlaying ? <StopIcon /> : <PlayArrowIcon />}

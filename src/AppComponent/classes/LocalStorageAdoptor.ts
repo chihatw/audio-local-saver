@@ -25,7 +25,8 @@ export class LocalStorageAdaptor {
             !!parsed.id &&
             !!parsed.bpm &&
             !!parsed.dataURI &&
-            !!parsed.assignmentId
+            !!parsed.assignmentId &&
+            typeof parsed.isPerfect === 'boolean'
           ) {
             // assignmentIdが古いものは削除
             if (parsed.assignmentId !== this._assignmentId) {
@@ -48,6 +49,9 @@ export class LocalStorageAdaptor {
     localStorage.removeItem(audioItem.id);
   }
   saveAudioItem(audioItem: AudioItem) {
+    localStorage.setItem(audioItem.id, JSON.stringify(audioItem));
+  }
+  updateAudioItem(audioItem: AudioItem) {
     localStorage.setItem(audioItem.id, JSON.stringify(audioItem));
   }
 }

@@ -28,16 +28,15 @@ const AudioItemTable = ({
             <TableCell>bpm</TableCell>
             <TableCell></TableCell>
             <TableCell></TableCell>
+            <TableCell></TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
           {audioItems.map((audioItem, index) => (
             <AudioItemRow
               key={index}
-              bpm={audioItem.bpm}
-              dataURI={audioItem.dataURI}
+              audioItem={audioItem}
               audioContext={audioContext}
-              miliSeconds={Number(audioItem.id)}
               handleDelete={() => deleteAudio(index)}
             />
           ))}
