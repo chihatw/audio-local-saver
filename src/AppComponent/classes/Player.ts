@@ -39,7 +39,6 @@ export class Player {
 
     try {
       const sourceNode = audioContext.createBufferSource();
-      alert(audioBuffer?.duration);
       sourceNode.buffer = audioBuffer;
 
       sourceNode.connect(audioContext.destination);
