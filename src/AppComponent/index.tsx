@@ -52,7 +52,7 @@ const AppComponent = ({
     const gainNode = audioContext.createGain();
     osc.connect(gainNode);
     gainNode.connect(audioContext.destination);
-    // gainNode.gain.value = 0;
+    gainNode.gain.value = 0;
     osc.start(audioContext.currentTime);
     osc.stop(audioContext.currentTime + 0.1);
     setAudioContext(audioContext);
@@ -89,7 +89,7 @@ const AppComponent = ({
         >
           <div style={{ height: 120 }}>
             <Button color='primary' onClick={handlePlay} variant='outlined'>
-              test
+              こんにちは
             </Button>
           </div>
         </div>
