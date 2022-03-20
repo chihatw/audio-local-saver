@@ -6,6 +6,7 @@ export class Player {
   private _sourceNode: AudioBufferSourceNode | null = null;
   private _audioContext: AudioContext | null = null;
   private _handleOnEnd: () => void = () => {};
+
   set audioContext(value: AudioContext) {
     this._audioContext = value;
   }

@@ -1,9 +1,11 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 import RecButtonPane from './components/RecButtonPane';
 import AudioItemTable from './components/AudioItemTable';
+import { LocalStorageAdaptor } from './classes/LocalStorageAdoptor';
 
 export type AudioItem = {
+  id: string;
   dataURI: string;
   duration: number;
   beatCount: number;
@@ -17,46 +19,30 @@ const AppComponent = ({
   beatCount: number;
   assignmentId: string;
 }) => {
+  const localStorageAdoptor = useMemo(
+    () => new LocalStorageAdaptor(assignmentId),
+    []
+  );
   const audioContextRef = useRef<AudioContext | null>(null);
-
   const [audioItems, setAudioItems] = useState<AudioItem[]>([]);
 
   useEffect(() => {
-    // localStorageから全て読み込み
-    const audioItems: AudioItem[] = [];
-    for (const key of Object.keys(localStorage)) {
-      const item = localStorage.getItem(key);
-      if (!!item) {
-        try {
-          const parsed = JSON.parse(item) as AudioItem;
-          // 型チェック
-          if (
-            !!parsed.dataURI &&
-            !!parsed.duration &&
-            !!parsed.beatCount &&
-            !!parsed.assignmentId
-          ) {
-            audioItems.push(parsed);
-          }
-        } catch (e) {
-          console.log('incorrect audio item');
-        }
-      }
-    }
-    setAudioItems(audioItems);
+    setAudioItems(localStorageAdoptor.getAudioItems());
   }, []);
 
   const deleteAudio = (index: number) => {
+    localStorageAdoptor.removeAudioItem(index);
+
     const cloned = [...audioItems];
     cloned.splice(index, 1);
     setAudioItems(cloned);
   };
 
   const pushAudioItem = (audioItem: AudioItem) => {
+    localStorageAdoptor.saveAudioItem(audioItem);
+
     const newAudioItems = [...audioItems, audioItem];
     setAudioItems(newAudioItems);
-    // localStorageに保存
-    localStorage.setItem(String(Date.now()), JSON.stringify(audioItem));
   };
 
   return (

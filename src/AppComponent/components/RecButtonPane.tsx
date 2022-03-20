@@ -34,6 +34,7 @@ const RecButtonPane = ({
         if (!!event.target) {
           const dataURI = event.target.result as string;
           const item: AudioItem = {
+            id: String(Date.now()),
             dataURI,
             duration: audioBuffer.duration,
             beatCount,
