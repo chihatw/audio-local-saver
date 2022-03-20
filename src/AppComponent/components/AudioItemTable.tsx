@@ -1,5 +1,11 @@
 import React from 'react';
-import { Table, TableBody } from '@mui/material';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+} from '@mui/material';
 
 import AudioItemRow from './AudioItemRow';
 import { AudioItem } from '..';
@@ -12,20 +18,35 @@ const AudioItemTable = ({
   audioItems: AudioItem[];
   audioContext: AudioContext;
   deleteAudio: (index: number) => void;
-}) => (
-  <Table size='small'>
-    <TableBody>
-      {audioItems.map((audioItem, index) => (
-        <AudioItemRow
-          key={index}
-          dataURI={audioItem.dataURI}
-          duration={audioItem.duration}
-          audioContext={audioContext}
-          handleDelete={() => deleteAudio(index)}
-        />
-      ))}
-    </TableBody>
-  </Table>
-);
+}) => {
+  if (!!audioItems.length) {
+    return (
+      <Table size='small'>
+        <TableHead>
+          <TableRow>
+            <TableCell>date</TableCell>
+            <TableCell>bpm</TableCell>
+            <TableCell></TableCell>
+            <TableCell></TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {audioItems.map((audioItem, index) => (
+            <AudioItemRow
+              key={index}
+              bpm={audioItem.bpm}
+              dataURI={audioItem.dataURI}
+              audioContext={audioContext}
+              miliSeconds={Number(audioItem.id)}
+              handleDelete={() => deleteAudio(index)}
+            />
+          ))}
+        </TableBody>
+      </Table>
+    );
+  } else {
+    return <></>;
+  }
+};
 
 export default AudioItemTable;

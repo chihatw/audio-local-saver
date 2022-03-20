@@ -7,13 +7,15 @@ import { TableRow, TableCell, IconButton } from '@mui/material';
 import { Player } from '../classes/Player';
 
 const AudioItemRow = ({
+  bpm,
   dataURI,
-  duration,
+  miliSeconds,
   audioContext,
   handleDelete,
 }: {
+  bpm: number;
   dataURI: string;
-  duration: number;
+  miliSeconds: number;
   audioContext: AudioContext;
   handleDelete: () => void;
 }) => {
@@ -38,7 +40,8 @@ const AudioItemRow = ({
 
   return (
     <TableRow>
-      <TableCell>{duration}</TableCell>
+      <TableCell>{getDate(miliSeconds)}</TableCell>
+      <TableCell>{bpm}</TableCell>
       <TableCell sx={{ width: 24 }}>
         <IconButton onClick={handleClick}>
           {isPlaying ? <StopIcon /> : <PlayArrowIcon />}
@@ -54,3 +57,16 @@ const AudioItemRow = ({
 };
 
 export default AudioItemRow;
+
+const getDate = (miliSeconds: number) => {
+  const date = new Date(miliSeconds);
+  const month = date.getMonth() + 1;
+  const day = date.getDate();
+  const hours = String(date.getHours());
+  const minuts = String(date.getMinutes());
+  const seconds = String(date.getSeconds());
+  return `${month}月${day}日 ${hours.padStart(2, '0')}:${minuts.padStart(
+    2,
+    '0'
+  )}:${seconds.padStart(2, '0')}`;
+};

@@ -10,11 +10,13 @@ const RecButtonPane = ({
   assignmentId,
   audioContext,
   pushAudioItem,
+  handleStartChecking,
 }: {
   beatCount: number;
   assignmentId: string;
   audioContext: AudioContext;
   pushAudioItem: (audioItems: AudioItem) => void;
+  handleStartChecking: () => void;
 }) => {
   const recorder = useMemo(() => new Recorder(), []);
 
@@ -31,13 +33,14 @@ const RecButtonPane = ({
       reader.onload = (event) => {
         if (!!event.target) {
           const dataURI = event.target.result as string;
+          const bpm = calcBpm({ beatCount, seconds: audioBuffer.duration });
           const item: AudioItem = {
             id: String(Date.now()),
+            bpm,
             dataURI,
-            duration: audioBuffer.duration,
-            beatCount,
             assignmentId,
           };
+          handleStartChecking();
           pushAudioItem(item);
         }
       };
@@ -64,3 +67,13 @@ const RecButtonPane = ({
 };
 
 export default RecButtonPane;
+
+const calcBpm = ({
+  seconds,
+  beatCount,
+}: {
+  seconds: number;
+  beatCount: number;
+}) => {
+  return Math.floor((beatCount * 60) / seconds);
+};

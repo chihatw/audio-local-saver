@@ -1,16 +1,16 @@
-import { Button } from '@mui/material';
 import React, { useEffect, useMemo, useState } from 'react';
 
+import CheckPane from './components/CheckPane';
 import RecButtonPane from './components/RecButtonPane';
 import AudioItemTable from './components/AudioItemTable';
+import SetupButtonPane from './components/SetupButtonPane';
 import { LocalStorageAdaptor } from './classes/LocalStorageAdoptor';
 import { AudioContextFactory } from './classes/AudioContextFactory';
 
 export type AudioItem = {
   id: string;
+  bpm: number;
   dataURI: string;
-  duration: number;
-  beatCount: number;
   assignmentId: string;
 };
 
@@ -25,6 +25,8 @@ const AppComponent = ({
     () => new LocalStorageAdaptor(assignmentId),
     []
   );
+
+  const [isChecking, setIsChecking] = useState(false);
   const [audioItems, setAudioItems] = useState<AudioItem[]>([]);
   const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
 
@@ -38,19 +40,24 @@ const AppComponent = ({
     const cloned = [...audioItems];
     cloned.splice(index, 1);
     setAudioItems(cloned);
+    localStorageAdaptor.audiItems = cloned;
   };
 
   const pushAudioItem = (audioItem: AudioItem) => {
     localStorageAdaptor.saveAudioItem(audioItem);
-
     const newAudioItems = [...audioItems, audioItem];
+    localStorageAdaptor.audiItems = newAudioItems;
     setAudioItems(newAudioItems);
   };
 
-  const handlePlay = async () => {
+  const handleSetup = async () => {
     const factory = new AudioContextFactory();
     const audioContext = factory.create();
     setAudioContext(audioContext);
+  };
+
+  const handleStartChecking = () => {
+    setIsChecking(true);
   };
 
   return (
@@ -62,32 +69,25 @@ const AppComponent = ({
             assignmentId={assignmentId}
             audioContext={audioContext}
             pushAudioItem={pushAudioItem}
+            handleStartChecking={handleStartChecking}
           />
           <AudioItemTable
             audioItems={audioItems}
             audioContext={audioContext}
             deleteAudio={deleteAudio}
           />
+          {isChecking && audioItems[audioItems.length - 1] && (
+            <CheckPane
+              bpm={audioItems[audioItems.length - 1].bpm}
+              dataURI={audioItems[audioItems.length - 1].dataURI}
+              audioContext={audioContext}
+              setIsChecking={setIsChecking}
+              deleteAudio={() => deleteAudio(audioItems.length)}
+            />
+          )}
         </>
       ) : (
-        <div
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '100vw',
-            height: '100vh',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
-        >
-          <div style={{ height: 120 }}>
-            <Button color='primary' onClick={handlePlay} variant='outlined'>
-              こんにちは
-            </Button>
-          </div>
-        </div>
+        <SetupButtonPane handleSetup={handleSetup} />
       )}
     </div>
   );

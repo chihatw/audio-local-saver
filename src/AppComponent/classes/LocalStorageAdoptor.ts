@@ -8,6 +8,10 @@ export class LocalStorageAdaptor {
     this._assignmentId = assignmentId;
   }
 
+  set audiItems(value: AudioItem[]) {
+    this._audioItems = value;
+  }
+
   getAudioItems() {
     // localStorageから全て読み込み
     const audioItems: AudioItem[] = [];
@@ -18,9 +22,9 @@ export class LocalStorageAdaptor {
           const parsed = JSON.parse(item) as AudioItem;
           // 型チェック
           if (
+            !!parsed.id &&
+            !!parsed.bpm &&
             !!parsed.dataURI &&
-            !!parsed.duration &&
-            !!parsed.beatCount &&
             !!parsed.assignmentId
           ) {
             // assignmentIdが古いものは削除
