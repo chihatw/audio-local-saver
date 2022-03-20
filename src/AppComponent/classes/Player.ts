@@ -6,6 +6,11 @@ export class Player {
   private _sourceNode: AudioBufferSourceNode | null = null;
   private _audioContext: AudioContext | null = null;
   private _handleOnEnd: () => void = () => {};
+  private _setErrMsg: (value: string) => void = () => {};
+
+  constructor(setErrMsg: (value: string) => void) {
+    this._setErrMsg = setErrMsg;
+  }
 
   set audioContext(value: AudioContext) {
     this._audioContext = value;
@@ -32,14 +37,19 @@ export class Player {
       audioContext.resume();
     }
 
-    const sourceNode = audioContext.createBufferSource();
-    sourceNode.buffer = audioBuffer;
+    try {
+      const sourceNode = audioContext.createBufferSource();
+      alert(audioBuffer?.duration);
+      sourceNode.buffer = audioBuffer;
 
-    sourceNode.connect(audioContext.destination);
-    sourceNode.onended = this._handleOnEnd;
+      sourceNode.connect(audioContext.destination);
+      sourceNode.onended = this._handleOnEnd;
 
-    sourceNode.start(0);
-    this._sourceNode = sourceNode;
+      sourceNode.start(0);
+      this._sourceNode = sourceNode;
+    } catch (e) {
+      this._setErrMsg(String(e));
+    }
   }
 
   stop() {

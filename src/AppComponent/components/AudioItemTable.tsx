@@ -8,10 +8,12 @@ const AudioItemTable = ({
   audioItems,
   audioContextRef,
   deleteAudio,
+  setErrMsg,
 }: {
   audioItems: AudioItem[];
   audioContextRef: React.MutableRefObject<AudioContext | null>;
   deleteAudio: (index: number) => void;
+  setErrMsg: (value: string) => void;
 }) => (
   <Table size='small'>
     <TableBody>
@@ -22,6 +24,7 @@ const AudioItemTable = ({
           duration={audioItem.duration}
           audioContextRef={audioContextRef}
           handleDelete={() => deleteAudio(index)}
+          setErrMsg={setErrMsg}
         />
       ))}
     </TableBody>

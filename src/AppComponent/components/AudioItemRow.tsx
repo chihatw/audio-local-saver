@@ -11,13 +11,15 @@ const AudioItemRow = ({
   duration,
   audioContextRef,
   handleDelete,
+  setErrMsg,
 }: {
   dataURI: string;
   duration: number;
   audioContextRef: React.MutableRefObject<AudioContext | null>;
   handleDelete: () => void;
+  setErrMsg: (value: string) => void;
 }) => {
-  const player = useMemo(() => new Player(), []);
+  const player = useMemo(() => new Player(setErrMsg), []);
   const [isPlaying, setIsPlaying] = useState(false);
 
   const handleOnEnd = () => {
@@ -34,13 +36,17 @@ const AudioItemRow = ({
 
         audioContextRef.current = audioContext;
         // ダミーで音を鳴らす
-        const osc = audioContext.createOscillator();
-        const gainNode = audioContext.createGain();
-        osc.connect(gainNode);
-        gainNode.connect(audioContext.destination);
-        gainNode.gain.value = 0;
-        osc.start(audioContext.currentTime);
-        osc.stop(audioContext.currentTime + 0.01);
+        try {
+          const osc = audioContext.createOscillator();
+          const gainNode = audioContext.createGain();
+          osc.connect(gainNode);
+          gainNode.connect(audioContext.destination);
+          // gainNode.gain.value = 0;
+          osc.start(audioContext.currentTime);
+          osc.stop(audioContext.currentTime + 0.03);
+        } catch (e) {
+          setErrMsg(String(e));
+        }
       }
       player.audioContext = audioContext;
       player.dataURI = dataURI;

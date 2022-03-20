@@ -26,6 +26,8 @@ const AppComponent = ({
   const audioContextRef = useRef<AudioContext | null>(null);
   const [audioItems, setAudioItems] = useState<AudioItem[]>([]);
 
+  const [errMsg, setErrMsg] = useState('');
+
   useEffect(() => {
     setAudioItems(localStorageAdoptor.getAudioItems());
   }, []);
@@ -57,7 +59,9 @@ const AppComponent = ({
         audioItems={audioItems}
         audioContextRef={audioContextRef}
         deleteAudio={deleteAudio}
+        setErrMsg={setErrMsg}
       />
+      <div>{errMsg}</div>
     </div>
   );
 };
