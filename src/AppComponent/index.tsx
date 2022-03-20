@@ -1,4 +1,5 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { Button } from '@mui/material';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import RecButtonPane from './components/RecButtonPane';
 import AudioItemTable from './components/AudioItemTable';
@@ -23,10 +24,8 @@ const AppComponent = ({
     () => new LocalStorageAdaptor(assignmentId),
     []
   );
-  const audioContextRef = useRef<AudioContext | null>(null);
   const [audioItems, setAudioItems] = useState<AudioItem[]>([]);
-
-  const [errMsg, setErrMsg] = useState('');
+  const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
 
   useEffect(() => {
     setAudioItems(localStorageAdoptor.getAudioItems());
@@ -47,21 +46,54 @@ const AppComponent = ({
     setAudioItems(newAudioItems);
   };
 
+  const handlePlay = async () => {
+    const audioContext = new window.AudioContext();
+    const osc = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+    osc.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+    // gainNode.gain.value = 0;
+    osc.start(audioContext.currentTime);
+    osc.stop(audioContext.currentTime + 0.1);
+    setAudioContext(audioContext);
+  };
+
   return (
     <div>
-      <RecButtonPane
-        beatCount={beatCount}
-        assignmentId={assignmentId}
-        audioContextRef={audioContextRef}
-        pushAudioItem={pushAudioItem}
-      />
-      <AudioItemTable
-        audioItems={audioItems}
-        audioContextRef={audioContextRef}
-        deleteAudio={deleteAudio}
-        setErrMsg={setErrMsg}
-      />
-      <div>{errMsg}</div>
+      {audioContext ? (
+        <>
+          <RecButtonPane
+            beatCount={beatCount}
+            assignmentId={assignmentId}
+            audioContext={audioContext}
+            pushAudioItem={pushAudioItem}
+          />
+          <AudioItemTable
+            audioItems={audioItems}
+            audioContext={audioContext}
+            deleteAudio={deleteAudio}
+          />
+        </>
+      ) : (
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100vw',
+            height: '100vh',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <div style={{ height: 120 }}>
+            <Button color='primary' onClick={handlePlay} variant='outlined'>
+              test
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

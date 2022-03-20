@@ -6,14 +6,12 @@ import { AudioItem } from '..';
 
 const AudioItemTable = ({
   audioItems,
-  audioContextRef,
+  audioContext,
   deleteAudio,
-  setErrMsg,
 }: {
   audioItems: AudioItem[];
-  audioContextRef: React.MutableRefObject<AudioContext | null>;
+  audioContext: AudioContext;
   deleteAudio: (index: number) => void;
-  setErrMsg: (value: string) => void;
 }) => (
   <Table size='small'>
     <TableBody>
@@ -22,9 +20,8 @@ const AudioItemTable = ({
           key={index}
           dataURI={audioItem.dataURI}
           duration={audioItem.duration}
-          audioContextRef={audioContextRef}
+          audioContext={audioContext}
           handleDelete={() => deleteAudio(index)}
-          setErrMsg={setErrMsg}
         />
       ))}
     </TableBody>

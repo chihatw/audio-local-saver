@@ -8,19 +8,17 @@ import blob2AudioBuffer from '../services/blob2AudioBuffer';
 const RecButtonPane = ({
   beatCount,
   assignmentId,
-  audioContextRef,
+  audioContext,
   pushAudioItem,
 }: {
   beatCount: number;
   assignmentId: string;
-  audioContextRef: React.MutableRefObject<AudioContext | null>;
+  audioContext: AudioContext;
   pushAudioItem: (audioItems: AudioItem) => void;
 }) => {
   const recorder = useMemo(() => new Recorder(), []);
 
   const handleOnDataAvailable = async (event: BlobEvent) => {
-    if (!audioContextRef.current) return;
-    const audioContext = audioContextRef.current;
     const blob = event.data;
     const audioBuffer = await blob2AudioBuffer({
       data: blob,
@@ -48,11 +46,6 @@ const RecButtonPane = ({
   };
 
   const handleRecordStart = () => {
-    let audioContext = audioContextRef.current;
-    if (!audioContext) {
-      audioContext = new window.AudioContext();
-      audioContextRef.current = audioContext;
-    }
     recorder.audioContext = audioContext;
     recorder.handleOnDataAvailable = handleOnDataAvailable;
     recorder.start();
