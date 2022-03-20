@@ -1,22 +1,30 @@
-export class Player {
-  private _sourceNode: AudioBufferSourceNode | null = null;
-  private _audioBuffer: AudioBuffer | null = null;
-  private _audioContext: AudioContext | null = null;
-  private _handleOnEnd: (() => void) | null = null;
+import dataURItoBlob from '../services/dataURItoBlob';
+import blob2AudioBuffer from '../services/blob2AudioBuffer';
 
+export class Player {
+  private _dataURI: string = '';
+  private _sourceNode: AudioBufferSourceNode | null = null;
+  private _audioContext: AudioContext | null = null;
+  private _handleOnEnd: () => void = () => {};
   set audioContext(value: AudioContext) {
     this._audioContext = value;
   }
-  set audioBuffer(value: AudioBuffer) {
-    this._audioBuffer = value;
+  set dataURI(value: string) {
+    this._dataURI = value;
   }
   set handleOnEnd(value: () => void) {
     this._handleOnEnd = value;
   }
-  play() {
-    if (!this._audioContext || !this._audioBuffer) return;
+  async play() {
+    if (!this._audioContext || !this._dataURI) return;
     const audioContext = this._audioContext;
-    const audioBuffer = this._audioBuffer;
+
+    const blob = dataURItoBlob(this._dataURI);
+
+    const audioBuffer = await blob2AudioBuffer({
+      data: blob,
+      audioContext,
+    });
 
     // 一時停止状態の解除
     if (audioContext.state === 'suspended') {
@@ -27,9 +35,8 @@ export class Player {
     sourceNode.buffer = audioBuffer;
 
     sourceNode.connect(audioContext.destination);
-    sourceNode.onended = () => {
-      !!this._handleOnEnd && this._handleOnEnd();
-    };
+    sourceNode.onended = this._handleOnEnd;
+
     sourceNode.start(0);
     this._sourceNode = sourceNode;
   }

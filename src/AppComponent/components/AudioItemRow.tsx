@@ -7,25 +7,35 @@ import { TableRow, TableCell, IconButton } from '@mui/material';
 import { Player } from '../classes/Player';
 
 const AudioItemRow = ({
+  dataURI,
   duration,
-  audioBuffer,
-  audioContext,
+  audioContextRef,
   handleDelete,
 }: {
+  dataURI: string;
   duration: number;
-  audioBuffer: AudioBuffer;
-  audioContext: AudioContext;
+  audioContextRef: React.MutableRefObject<AudioContext | null>;
   handleDelete: () => void;
 }) => {
   const player = useMemo(() => new Player(), []);
   const [isPlaying, setIsPlaying] = useState(false);
 
+  const handleOnEnd = () => {
+    setIsPlaying(false);
+  };
+
   const handleClick = () => {
     if (isPlaying) {
       player.stop();
     } else {
+      let audioContext = audioContextRef.current;
+      if (!audioContext) {
+        audioContext = new window.AudioContext();
+        audioContextRef.current = audioContext;
+      }
       player.audioContext = audioContext;
-      player.audioBuffer = audioBuffer;
+      player.dataURI = dataURI;
+      player.handleOnEnd = handleOnEnd;
       player.play();
     }
     setIsPlaying(!isPlaying);

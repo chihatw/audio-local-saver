@@ -5,7 +5,7 @@ function App() {
   return (
     <div style={{ background: '#eee', minHeight: '100vh' }}>
       <Container maxWidth='sm' sx={{ paddingTop: 5 }}>
-        <AppComponent />
+        <AppComponent assignmentId='001' beatCount={68} />
       </Container>
     </div>
   );

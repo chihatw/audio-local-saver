@@ -1,72 +1,77 @@
-import { Table, TableBody } from '@mui/material';
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
-import StartButton from './components/StartButton';
-import { Recorder } from './classes/Recorder';
-import AudioItemRow from './components/AudioItemRow';
+import RecButtonPane from './components/RecButtonPane';
+import AudioItemTable from './components/AudioItemTable';
 
-const AppComponent = () => {
-  const recorder = useMemo(() => new Recorder(), []);
+export type AudioItem = {
+  dataURI: string;
+  duration: number;
+  beatCount: number;
+  assignmentId: string;
+};
 
+const AppComponent = ({
+  beatCount,
+  assignmentId,
+}: {
+  beatCount: number;
+  assignmentId: string;
+}) => {
   const audioContextRef = useRef<AudioContext | null>(null);
 
-  const [audioItems, setAudioBuffers] = useState<
-    { buffer: AudioBuffer; duration: number }[]
-  >([]);
+  const [audioItems, setAudioItems] = useState<AudioItem[]>([]);
 
-  const handleSetAudioBuffer = (buffer: AudioBuffer | null) => {
-    if (buffer) {
-      const newItem = { buffer, duration: buffer.duration };
-      let cloned = [...audioItems, newItem];
-
-      setAudioBuffers(cloned);
+  useEffect(() => {
+    // localStorageから全て読み込み
+    const audioItems: AudioItem[] = [];
+    for (const key of Object.keys(localStorage)) {
+      const item = localStorage.getItem(key);
+      if (!!item) {
+        try {
+          const parsed = JSON.parse(item) as AudioItem;
+          // 型チェック
+          if (
+            !!parsed.dataURI &&
+            !!parsed.duration &&
+            !!parsed.beatCount &&
+            !!parsed.assignmentId
+          ) {
+            audioItems.push(parsed);
+          }
+        } catch (e) {
+          console.log('incorrect audio item');
+        }
+      }
     }
-  };
+    setAudioItems(audioItems);
+  }, []);
 
-  const handleRecordStart = () => {
-    let audioContext = audioContextRef.current;
-    if (!audioContext) {
-      audioContext = new window.AudioContext();
-      audioContextRef.current = audioContext;
-    }
-    recorder.audioContext = audioContext;
-    recorder.setAudioBuffer = handleSetAudioBuffer;
-    recorder.start();
-  };
-
-  const handleRecordStop = () => {
-    if (!recorder) return;
-    recorder.stop();
-  };
-
-  const handleDeleteAudio = (index: number) => {
+  const deleteAudio = (index: number) => {
     const cloned = [...audioItems];
     cloned.splice(index, 1);
-    setAudioBuffers(cloned);
+    setAudioItems(cloned);
+  };
+
+  const pushAudioItem = (audioItem: AudioItem) => {
+    const newAudioItems = [...audioItems, audioItem];
+    setAudioItems(newAudioItems);
+    // localStorageに保存
+    localStorage.setItem(String(Date.now()), JSON.stringify(audioItem));
   };
 
   return (
     <div>
-      <StartButton
-        superHandleStop={handleRecordStop}
-        superHandleStart={handleRecordStart}
+      <RecButtonPane
+        beatCount={beatCount}
+        assignmentId={assignmentId}
+        audioContextRef={audioContextRef}
+        pushAudioItem={pushAudioItem}
       />
-      <div>
-        <Table size='small'>
-          <TableBody>
-            {!!audioContextRef.current &&
-              audioItems.map((audioItem, index) => (
-                <AudioItemRow
-                  key={index}
-                  duration={audioItem.duration}
-                  audioBuffer={audioItem.buffer}
-                  audioContext={audioContextRef.current!}
-                  handleDelete={() => handleDeleteAudio(index)}
-                />
-              ))}
-          </TableBody>
-        </Table>
-      </div>
+      <AudioItemTable
+        audioItems={audioItems}
+        audioContextRef={audioContextRef}
+        deleteAudio={deleteAudio}
+      />
     </div>
   );
 };

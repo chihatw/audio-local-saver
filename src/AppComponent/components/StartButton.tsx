@@ -1,6 +1,6 @@
+import MicIcon from '@mui/icons-material/Mic';
 import { IconButton } from '@mui/material';
 import React, { useState } from 'react';
-import PlayCircleRoundedIcon from '@mui/icons-material/PlayCircleRounded';
 import StopCircleRoundedIcon from '@mui/icons-material/StopCircleRounded';
 
 const StartButton = ({
@@ -31,7 +31,7 @@ const StartButton = ({
         {isRecording ? (
           <StopCircleRoundedIcon sx={{ fontSize: 120 }} />
         ) : (
-          <PlayCircleRoundedIcon sx={{ fontSize: 120 }} />
+          <MicIcon sx={{ fontSize: 120 }} />
         )}
       </IconButton>
     </div>

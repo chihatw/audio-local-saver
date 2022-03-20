@@ -2,15 +2,14 @@ export class Recorder {
   private _audioElem = new Audio();
   private _audioContext: AudioContext | null = null;
   private _mediaRecorder: MediaRecorder | null = null;
-  private _setAudioBuffer: ((audioBuffer: AudioBuffer | null) => void) | null =
-    null;
+  private _handleOnDataAvailable: (event: BlobEvent) => void = () => {};
 
   set audioContext(value: AudioContext) {
     this._audioContext = value;
   }
 
-  set setAudioBuffer(value: (audioBuffer: AudioBuffer | null) => void) {
-    this._setAudioBuffer = value;
+  set handleOnDataAvailable(value: (event: BlobEvent) => void) {
+    this._handleOnDataAvailable = value;
   }
 
   async start() {
@@ -25,14 +24,7 @@ export class Recorder {
     const mediaRecorder = new MediaRecorder(stream);
 
     // データが入力されたら、audioBufferを作成
-    mediaRecorder.ondataavailable = async (e) => {
-      const blob = e.data;
-      const audioBuffer = await blobForAudioBuffer({
-        data: blob,
-        audioContext: this._audioContext!,
-      });
-      !!this._setAudioBuffer && this._setAudioBuffer(audioBuffer);
-    };
+    mediaRecorder.ondataavailable = this._handleOnDataAvailable;
     mediaRecorder.start();
     this._mediaRecorder = mediaRecorder;
   }
@@ -49,37 +41,3 @@ export class Recorder {
     this._mediaRecorder = null;
   }
 }
-
-const blobForAudioBuffer = async ({
-  data,
-  audioContext,
-}: {
-  data: Blob;
-  audioContext: AudioContext;
-}): Promise<AudioBuffer | null> => {
-  const chunks: Blob[] = [];
-  chunks.push(data);
-  const blob = new Blob(chunks, { type: 'audio/ogg; codecs=opus' });
-  const arrayBuffer = await blob.arrayBuffer();
-  let audioBuffer = null;
-  if (!!arrayBuffer) {
-    audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
-    normalize(audioBuffer);
-  }
-  return audioBuffer;
-};
-
-const normalize = (audioBuffer: AudioBuffer) => {
-  const audioData = audioBuffer.getChannelData(0);
-
-  let ymax = 0; // 配列内の最大値
-  for (let i = 0; i < audioData.length; i++) {
-    const y = Math.abs(audioData[i]);
-    y > ymax && (ymax = y);
-  }
-
-  for (let i = 0; i < audioData.length; i++) {
-    // 最大値に対する比率を計算
-    audioData[i] /= ymax;
-  }
-};
