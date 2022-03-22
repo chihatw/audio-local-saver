@@ -36,7 +36,8 @@ const CloudAudioItemRow = ({ audioItem }: { audioItem: AudioItem }) => {
 
   return (
     <TableRow>
-      <TableCell>{audioItem.assignmentId}</TableCell>
+      <TableCell>{audioItem.workoutId}</TableCell>
+      <TableCell>{audioItem.dateId}</TableCell>
       <TableCell>{getDate(Number(audioItem.id))}</TableCell>
       <TableCell>{audioItem.bpm}</TableCell>
       <TableCell

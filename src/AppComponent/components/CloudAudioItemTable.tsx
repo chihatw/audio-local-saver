@@ -18,7 +18,8 @@ const CloudAudioItemTable = () => {
       <Table>
         <TableHead>
           <TableRow>
-            <TableCell>assignId</TableCell>
+            <TableCell>workoutId</TableCell>
+            <TableCell>dateId</TableCell>
             <TableCell>date</TableCell>
             <TableCell>bpm</TableCell>
             <TableCell></TableCell>

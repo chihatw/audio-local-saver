@@ -8,7 +8,7 @@ function App() {
   return (
     <div style={{ background: '#eee', minHeight: '100vh' }}>
       <Container maxWidth='sm' sx={{ paddingTop: 5 }}>
-        <AppComponent assignmentId='002' beatCount={68} />
+        <AppComponent dateId='002' beatCount={68} workoutId='test' />
         <CloudAudioItemTable />
       </Container>
     </div>
