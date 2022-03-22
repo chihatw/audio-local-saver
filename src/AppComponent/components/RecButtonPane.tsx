@@ -6,14 +6,16 @@ import { AudioItem } from '..';
 import blob2AudioBuffer from '../services/blob2AudioBuffer';
 
 const RecButtonPane = ({
+  dateId,
   beatCount,
-  assignmentId,
+  workoutId,
   audioContext,
   pushAudioItem,
   handleStartChecking,
 }: {
+  dateId: string;
   beatCount: number;
-  assignmentId: string;
+  workoutId: string;
   audioContext: AudioContext;
   pushAudioItem: (audioItems: AudioItem) => void;
   handleStartChecking: () => void;
@@ -37,9 +39,10 @@ const RecButtonPane = ({
           const item: AudioItem = {
             id: String(Date.now()),
             bpm,
+            dateId,
             dataURI,
+            workoutId,
             isPerfect: true,
-            assignmentId,
           };
           handleStartChecking();
           pushAudioItem(item);

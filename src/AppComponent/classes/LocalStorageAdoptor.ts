@@ -2,10 +2,12 @@ import { AudioItem } from '..';
 
 export class LocalStorageAdaptor {
   private _audioItems: AudioItem[] = [];
-  private _assignmentId: string;
+  private _dateId: string;
+  private _workoutId: string;
 
-  constructor(assignmentId: string) {
-    this._assignmentId = assignmentId;
+  constructor({ dateId, workoutId }: { dateId: string; workoutId: string }) {
+    this._dateId = dateId;
+    this._workoutId = workoutId;
   }
 
   set audiItems(value: AudioItem[]) {
@@ -24,15 +26,18 @@ export class LocalStorageAdaptor {
           if (
             !!parsed.id &&
             !!parsed.bpm &&
+            !!parsed.dateId &&
             !!parsed.dataURI &&
-            !!parsed.assignmentId &&
+            !!parsed.workoutId &&
             typeof parsed.isPerfect === 'boolean'
           ) {
             // assignmentIdが古いものは削除
-            if (parsed.assignmentId !== this._assignmentId) {
+            if (parsed.dataURI !== this._dateId) {
               localStorage.removeItem(key);
             } else {
-              audioItems.push(parsed);
+              if (parsed.workoutId === this._workoutId) {
+                audioItems.push(parsed);
+              }
             }
           }
         } catch (e) {

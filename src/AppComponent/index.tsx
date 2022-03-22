@@ -11,21 +11,24 @@ import { AudioContextFactory } from './classes/AudioContextFactory';
 export type AudioItem = {
   id: string;
   bpm: number;
+  dateId: string;
   dataURI: string;
+  workoutId: string;
   isPerfect: boolean;
-  assignmentId: string;
 };
 
 const AppComponent = ({
+  dateId,
+  workoutId,
   beatCount,
-  assignmentId,
 }: {
+  dateId: string;
   beatCount: number;
-  assignmentId: string;
+  workoutId: string;
 }) => {
   const { deleteAudioItem } = useAudioItems();
   const localStorageAdaptor = useMemo(
-    () => new LocalStorageAdaptor(assignmentId),
+    () => new LocalStorageAdaptor({ dateId, workoutId }),
     []
   );
 
@@ -79,8 +82,9 @@ const AppComponent = ({
       {audioContext ? (
         <>
           <RecButtonPane
+            dateId={dateId}
             beatCount={beatCount}
-            assignmentId={assignmentId}
+            workoutId={workoutId}
             audioContext={audioContext}
             pushAudioItem={pushAudioItem}
             handleStartChecking={handleStartChecking}
